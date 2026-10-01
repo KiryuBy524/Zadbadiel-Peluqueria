@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ modulo.titulo }} - Zabdiel{% endblock %}
+{% block breadcrumb %}{{ modulo.titulo }}{% endblock %}
+
+{% block content %}
+<div class="form-panel-box" style="text-align: center; padding: 3rem 2rem; max-width: 640px;">
+    <div style="display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid var(--border-control); padding: 0.25rem 0.65rem; border-radius: var(--radius-xs); margin-bottom: 1rem;">
+        {{ modulo.fase }}
+    </div>
+    
+    <h1 style="font-size: 1.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-main); margin-bottom: 0.75rem;">
+        {{ modulo.titulo }}
+    </h1>
+    
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+        {{ modulo.descripcion }}
+    </p>
+
+    <div style="background-color: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem; text-align: left; margin-bottom: 2rem;">
+        <div style="font-size: 0.72rem; font-family: var(--font-mono); font-weight: 700; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">
+            Detalles:
+        </div>
+        <ul style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-left: 1.25rem; line-height: 1.5;">
+            <li>Módulo planificado para una versión posterior.</li>
+            <li>Integración compatible con el sistema actual.</li>
+        </ul>
+    </div>
+
+    <a href="{% url 'catalogo' %}" class="btn-primary-action">
+        Volver al Catálogo
+    </a>
+</div>
+{% endblock %}

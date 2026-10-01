@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo - Zabdiel{% endblock %}
+{% block breadcrumb %}Catálogo{% endblock %}
+
+{% block content %}
+<section class="kpi-strip" aria-label="Resumen de Inventario">
+    <div class="kpi-strip-item">
+        <span class="kpi-strip-label">Total Productos</span>
+        <span class="kpi-strip-value">{{ total_productos }}</span>
+    </div>
+    <div class="kpi-strip-item">
+        <span class="kpi-strip-label">Stock Normal</span>
+        <span class="kpi-strip-value status-optimo">{{ stock_seguro }}</span>
+    </div>
+    <div class="kpi-strip-item">
+        <span class="kpi-strip-label">Stock Bajo</span>
+        <span class="kpi-strip-value status-alerta">{{ alertas_stock }}</span>
+    </div>
+    <div class="kpi-strip-item">
+        <span class="kpi-strip-label">Sin Stock</span>
+        <span class="kpi-strip-value status-quiebre">{{ quiebres_stock }}</span>
+    </div>
+</section>
+
+<section class="data-table-container">
+    <div class="table-toolbar">
+        <div class="table-title-group">
+            <h1 class="table-title">Catálogo de Productos</h1>
+            <span class="table-subtitle">Stock en Bodega y Retail</span>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <form method="get" action="{% url 'catalogo' %}" class="search-form">
+                <input 
+                    type="search" 
+                    name="q" 
+                    value="{{ query }}" 
+                    class="form-control" 
+                    placeholder="Buscar por código, producto o marca..."
+                    aria-label="Buscar producto"
+                >
+                <button type="submit" class="btn-secondary-action">
+                    Buscar
+                </button>
+                {% if query %}
+                <a href="{% url 'catalogo' %}" class="btn-secondary-action" title="Limpiar búsqueda">
+                    Limpiar
+                </a>
+                {% endif %}
+            </form>
+
+            <a href="{% url 'crear_producto' %}" class="btn-primary-action">
+                Nuevo Producto
+            </a>
+        </div>
+    </div>
+
+    {% if query %}
+    <div style="padding: 0.5rem 1rem; font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted); border-bottom: 1px solid var(--border-subtle);">
+        Búsqueda: "<strong style="color: var(--gold-primary);">{{ query }}</strong>" &bull; {{ productos.count }} resultado(s)
+    </div>
+    {% endif %}
+
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 130px;">Código</th>
+                    <th scope="col">Descripción &bull; Marca</th>
+                    <th scope="col" style="text-align: right; width: 150px;">Bodega</th>
+                    <th scope="col" style="text-align: right; width: 150px;">Retail</th>
+                    <th scope="col" style="text-align: center; width: 110px;">Umbral Mín.</th>
+                    <th scope="col" style="text-align: center; width: 220px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>
+                        <span class="code-cell">{{ producto.codigo_barra }}</span>
+                        <div class="branch-tag">{{ producto.branch_id }}</div>
+                    </td>
+                    <td>
+                        <div class="item-name">{{ producto.nombre }}</div>
+                        <div class="item-brand">{{ producto.marca }}</div>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="stock-indicator badge-{{ producto.semaforo_bodega }} {{ producto.semaforo_bodega }}">
+                            <span class="status-dot"></span>
+                            <span>{{ producto.stock_bodega }} u.</span>
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="stock-indicator badge-{{ producto.semaforo_retail }} {{ producto.semaforo_retail }}">
+                            <span class="status-dot"></span>
+                            <span>{{ producto.stock_retail }} u.</span>
+                        </span>
+                    </td>
+                    <td style="text-align: center; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">
+                        &le; {{ producto.umbral_minimo }}
+                    </td>
+                    <td>
+                        <div class="btn-group-actions">
+                            <a href="{% url 'transaccion_pin' producto.id %}?tipo=VENTA" class="btn-ghost action-sale" title="Venta">
+                                Venta
+                            </a>
+                            <a href="{% url 'transaccion_pin' producto.id %}?tipo=CONSUMO_INTERNO" class="btn-ghost action-salon" title="Uso en salón">
+                                Salón
+                            </a>
+                            <a href="{% url 'transaccion_pin' producto.id %}?tipo=INGRESO_BODEGA" class="btn-ghost action-restock" title="Reponer stock">
+                                Reponer
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                        <div style="font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                            Sin resultados
+                        </div>
+                        <p style="font-size: 0.8rem; margin-bottom: 1rem;">
+                            No se encontraron productos.
+                        </p>
+                        <a href="{% url 'crear_producto' %}" class="btn-primary-action">
+                            Nuevo Producto
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

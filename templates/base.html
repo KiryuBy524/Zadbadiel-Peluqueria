@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zabdiel - Inventario{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body class="{% if operador_activo %}app-body{% else %}auth-body{% endif %}">
+
+{% if operador_activo %}
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Navegación">
+            <div>
+                <div class="sidebar-header">
+                    <div class="brand-info">
+                        <span class="brand-name">Zabdiel</span>
+                        <span class="brand-badge">Inventario</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-section-title">Operaciones</div>
+                    <ul class="nav-menu">
+                        <li>
+                            <a href="{% url 'catalogo' %}" class="nav-link {% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">
+                                <span>Catálogo</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'crear_producto' %}" class="nav-link {% if request.resolver_match.url_name == 'crear_producto' %}active{% endif %}">
+                                <span>Nuevo Producto</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="nav-section-title" style="margin-top: 1.25rem;">Otros Módulos</div>
+                    <ul class="nav-menu">
+                        <li>
+                            <a href="{% url 'en_construccion' 'cctv' %}" class="nav-link {% if 'cctv' in request.path %}active{% endif %}">
+                                <span>CCTV Sync</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'en_construccion' 'mermas' %}" class="nav-link {% if 'mermas' in request.path %}active{% endif %}">
+                                <span>Reporte Mermas</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'en_construccion' 'multilocal' %}" class="nav-link {% if 'multilocal' in request.path %}active{% endif %}">
+                                <span>Multilocal</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-status-strip">
+                    <span class="user-status-name" title="{{ operador_activo.nombre }}">{{ operador_activo.nombre }}</span>
+                    <span class="user-status-role">{{ operador_activo.get_rol_display }}</span>
+                </div>
+
+                <a href="{% url 'logout' %}" class="btn-lock" title="Cerrar turno">
+                    Cerrar Turno
+                </a>
+            </div>
+        </aside>
+
+        <div class="main-viewport">
+            <header class="topbar">
+                <div class="topbar-breadcrumbs">
+                    <span>Zabdiel</span>
+                    <span>/</span>
+                    <span class="current">{% block breadcrumb %}Catálogo{% endblock %}</span>
+                </div>
+
+                <div class="topbar-meta">
+                    <span class="meta-item branch">
+                        LOCAL-01
+                    </span>
+                    <span class="meta-item">
+                        {{ operador_activo.nombre }}
+                    </span>
+                    <span class="meta-item status">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+                        En Línea
+                    </span>
+                </div>
+            </header>
+
+            <main class="workspace">
+                {% if messages %}
+                <div class="messages-container" role="alert" aria-live="polite">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="content-body">
+{% else %}
+    <div class="auth-standalone-wrapper">
+        {% if messages %}
+        <div style="position: fixed; top: 1rem; right: 1rem; z-index: 999; max-width: 420px;">
+            <div class="messages-container" role="alert" aria-live="polite">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+{% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+{% if operador_activo %}
+                </div>
+            </main>
+        </div>
+    </div>
+{% else %}
+    </div>
+{% endif %}
+
+</body>
+</html>

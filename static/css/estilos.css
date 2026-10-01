@@ -1,0 +1,969 @@
+/* ==========================================================================
+   ZABDIEL SALÓN DE BELLEZA - SISTEMA DE CONTROL DE INVENTARIO
+   Diseño ERP / SaaS Industrial - Minimalismo Sobrio & Identidad Corporativa
+   ========================================================================== */
+
+:root {
+  /* Paleta Base Antracita / Carbón Mate Neutro (Sin matices azulados) */
+  --bg-app: #121212;                /* Fondo base oscuro neutro */
+  --bg-surface: #202023;            /* Superficie principal (tarjetas/aside) */
+  --bg-surface-hover: #27272a;      /* Hover sutil de filas y menús */
+  --bg-input: #18181b;              /* Inputs fondo mate carbón */
+
+  /* Bordes Técnicos Ultrafinos */
+  --border-subtle: #2d2d32;         /* Separadores primarios */
+  --border-card: #3f3f46;           /* Borde ultra-fino de tarjeta */
+  --border-control: #38383e;        /* Bordes de inputs y botones outline */
+  --border-focus: #c5a059;          /* Foco dorado mate */
+
+  /* Tipografía */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  
+  --text-main: #f4f4f5;             /* Blanco neutro suave */
+  --text-secondary: #a1a1aa;        /* Gris neutro zinc */
+  --text-muted: #71717a;            /* Texto atenuado / etiquetas técnicas */
+
+  /* Acento Metálico Oro Mate */
+  --gold-primary: #c5a059;
+  --gold-hover: #d4af37;
+  --gold-subtle: rgba(197, 160, 89, 0.08);
+
+  /* Semáforos Discretos de Datos (Texto sin fondos saturados) */
+  --stock-optimo: #a1a1aa;
+  --stock-alerta: #d97706;
+  --stock-quiebre: #ef4444;
+  
+  --dot-optimo: #10b981;
+  --dot-alerta: #f59e0b;
+  --dot-quiebre: #ef4444;
+
+  /* Dimensiones Compactas */
+  --sidebar-width: 250px;
+  --topbar-height: 48px;
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+}
+
+/* ==========================================================================
+   RESET & BASES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.45;
+  font-size: 13px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--gold-primary);
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+
+a:hover {
+  color: var(--gold-hover);
+}
+
+/* ==========================================================================
+   1. ARQUITECTURA DE LAYOUT (SIDEBAR + VIEWPORT)
+   ========================================================================== */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Menú Lateral Fijo (Aside) */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 1.15rem 1rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-logo-box {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-control);
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-monogram {
+  width: 32px;
+  height: 32px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--gold-primary);
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  letter-spacing: 0.05em;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.brand-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-main);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.brand-badge {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* Navegación Vertical Minimalista */
+.sidebar-nav {
+  padding: 1rem 0.65rem;
+  flex: 1;
+}
+
+.nav-section-title {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 0 0.65rem 0.5rem;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-left: 2px solid transparent;
+  transition: all 0.12s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+
+.nav-link.active {
+  background-color: var(--gold-subtle);
+  color: var(--gold-primary);
+  border-left-color: var(--gold-primary);
+  font-weight: 600;
+}
+
+/* Pie de Barra Lateral */
+.sidebar-footer {
+  padding: 0.85rem 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  background-color: rgba(5, 8, 15, 0.4);
+}
+
+.user-status-strip {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.65rem;
+  padding: 0 0.25rem;
+}
+
+.user-status-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-status-role {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-lock {
+  width: 100%;
+  background-color: transparent;
+  color: #f87171;
+  border: 1px solid #451a1a;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-align: center;
+  display: block;
+  transition: all 0.12s ease;
+}
+
+.btn-lock:hover {
+  background-color: #451a1a;
+  color: #ffffff;
+  border-color: #7f1d1d;
+}
+
+/* ==========================================================================
+   ÁREA PRINCIPAL (TOPBAR + WORKSPACE)
+   ========================================================================== */
+.main-viewport {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-app);
+}
+
+/* Topbar Discreta */
+.topbar {
+  height: var(--topbar-height);
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.topbar-breadcrumbs {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.topbar-breadcrumbs .current {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.meta-item {
+  color: var(--text-muted);
+  border-right: 1px solid var(--border-subtle);
+  padding-right: 0.75rem;
+}
+
+.meta-item.branch {
+  color: var(--gold-primary);
+  font-weight: 700;
+}
+
+.meta-item.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #10b981;
+  border-right: none;
+  padding-right: 0;
+}
+
+/* Workspace */
+.workspace {
+  padding: 1.5rem;
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   2. PANTALLA DE LOGIN (ESTRUCTURA SPLIT 2 COLUMNAS)
+   ========================================================================== */
+.auth-split-wrapper {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  background-color: var(--bg-app);
+}
+
+/* Columna Izquierda: Banner Visual Exclusivo con Logo Centrado */
+.auth-visual-panel {
+  background-color: #18181b;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem;
+}
+
+.auth-logo-hero-wrapper {
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-hero-logo {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/* Columna Derecha: Tarjeta de Acceso Centrada */
+.auth-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--bg-app);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.login-brand-header {
+  margin-bottom: 1.75rem;
+}
+
+.login-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text-main);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.login-pin-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold-primary);
+  margin-bottom: 0.4rem;
+  text-align: center;
+}
+
+/* Input PIN Numérico con Espaciado y Modo Contraseña */
+.input-pin, .input-pin-confirm {
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-mono) !important;
+  font-size: 1.25rem !important;
+  text-align: center !important;
+  letter-spacing: 0.25em !important;
+  font-weight: 700;
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-control) !important;
+  color: var(--gold-primary) !important;
+  border-radius: var(--radius-xs) !important;
+  transition: border-color 0.12s ease;
+}
+
+.input-pin:focus, .input-pin-confirm:focus {
+  outline: none;
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 0 0 1px var(--gold-primary) !important;
+}
+
+.btn-login-submit {
+  width: 100%;
+  background-color: var(--gold-primary);
+  color: #121212 !important;
+  border: 1px solid var(--gold-hover);
+  padding: 0.65rem 1rem;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-login-submit:hover {
+  background-color: var(--gold-hover);
+}
+
+.login-demo-footer {
+  margin-top: 1.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 10px;
+  opacity: 0.5;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ==========================================================================
+   3. BARRA DE ESTADO INTEGRADA (KPI STRIP)
+   ========================================================================== */
+.kpi-strip {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.kpi-strip-item {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.kpi-strip-item:last-child {
+  border-right: none;
+}
+
+.kpi-strip-label {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.kpi-strip-value {
+  font-size: 1.15rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.kpi-strip-value.status-optimo {
+  color: var(--text-main);
+}
+
+.kpi-strip-value.status-alerta {
+  color: var(--stock-alerta);
+}
+
+.kpi-strip-value.status-quiebre {
+  color: var(--stock-quiebre);
+}
+
+/* ==========================================================================
+   4. TABLA DE INVENTARIO PROFESIONAL (DATA TABLE ERP)
+   ========================================================================== */
+.data-table-container {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.table-toolbar {
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: rgba(8, 12, 20, 0.4);
+}
+
+.table-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.table-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+}
+
+.table-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.data-table th {
+  background-color: var(--bg-app);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+  color: var(--text-main);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.code-cell {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+.branch-tag {
+  font-size: 0.62rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.item-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.item-brand {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Indicadores de Stock Limpios con Micro-Dot */
+.stock-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stock-indicator.verde {
+  color: var(--stock-optimo);
+}
+.stock-indicator.verde .status-dot {
+  background-color: var(--dot-optimo);
+}
+
+.stock-indicator.amarillo {
+  color: var(--stock-alerta);
+}
+.stock-indicator.amarillo .status-dot {
+  background-color: var(--dot-alerta);
+}
+
+.stock-indicator.rojo {
+  color: var(--stock-quiebre);
+  font-weight: 700;
+}
+.stock-indicator.rojo .status-dot {
+  background-color: var(--dot-quiebre);
+}
+
+/* ==========================================================================
+   5. BOTONES TÉCNICOS Y GHOST
+   ========================================================================== */
+.btn-group-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-control);
+  padding: 0.28rem 0.55rem;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.btn-ghost:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-main);
+  border-color: var(--text-secondary);
+}
+
+.btn-ghost.action-sale:hover {
+  border-color: var(--gold-primary);
+  color: var(--gold-primary);
+}
+
+.btn-ghost.action-salon:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.btn-ghost.action-restock:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.btn-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gold-primary);
+  color: #080c14 !important;
+  border: 1px solid var(--gold-hover);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.btn-primary-action:hover {
+  background-color: var(--gold-hover);
+}
+
+.btn-secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-control);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-secondary-action:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-main) !important;
+  border-color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   6. FORMULARIOS E INPUTS SOBRIOS
+   ========================================================================== */
+.form-group {
+  margin-bottom: 1.15rem;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-xs);
+  transition: border-color 0.12s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.form-help {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.form-error {
+  color: #f87171;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  margin-top: 0.25rem;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+/* ==========================================================================
+   7. PANELES DE TRANSACCIÓN Y MÓDULOS
+   ========================================================================== */
+.form-panel-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1.75rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.form-panel-header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+}
+
+.audit-notice {
+  background-color: var(--bg-app);
+  border-left: 3px solid var(--gold-primary);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.audit-notice strong {
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   8. NOTIFICACIONES DEL SISTEMA (COMPACT BANNER / TOAST)
+   ========================================================================== */
+.messages-container {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.alert {
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.alert-success {
+  background-color: rgba(6, 78, 59, 0.4);
+  color: #6ee7b7;
+  border-color: #047857;
+}
+
+.alert-error {
+  background-color: rgba(69, 10, 10, 0.4);
+  color: #fca5a5;
+  border-color: #991b1b;
+}
+
+.alert-warning {
+  background-color: rgba(120, 53, 15, 0.4);
+  color: #fcd34d;
+  border-color: #b45309;
+}
+
+.alert-info {
+  background-color: rgba(8, 47, 73, 0.4);
+  color: #7dd3fc;
+  border-color: #0284c7;
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD
+   ========================================================================== */
+@media (max-width: 900px) {
+  .auth-split-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .auth-visual-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  .main-viewport {
+    margin-left: 0;
+  }
+  .app-shell {
+    flex-direction: column;
+  }
+  .kpi-strip {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .kpi-strip-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-form {
+    max-width: 100%;
+  }
+}

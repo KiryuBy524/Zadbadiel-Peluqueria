@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - Zabdiel{% endblock %}
+
+{% block content %}
+<div class="auth-split-wrapper">
+    <section class="auth-visual-panel">
+        <div class="auth-logo-hero-wrapper">
+            <img 
+                src="{% static 'img/logo_zabdiel.png' %}" 
+                alt="Zabdiel Salón de Belleza" 
+                class="auth-hero-logo"
+            >
+        </div>
+    </section>
+
+    <section class="auth-form-panel">
+        <div class="login-card">
+            <div class="login-brand-header">
+                <h1 class="login-title">Zabdiel</h1>
+                <p class="login-subtitle">Salón de Belleza</p>
+            </div>
+
+            <form method="post" action="{% url 'login' %}" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="{{ form.pin.id_for_label }}" class="login-pin-label">
+                        PIN
+                    </label>
+                    {{ form.pin }}
+                    {% if form.pin.errors %}
+                    <div class="form-error" style="text-align: center; margin-top: 0.4rem;">
+                        {% for error in form.pin.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn-login-submit">
+                    Ingresar
+                </button>
+            </form>
+
+            <div class="login-demo-footer">
+                PINs de prueba: Dueña (1234), Cajero (5678), Estilista (9012)
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

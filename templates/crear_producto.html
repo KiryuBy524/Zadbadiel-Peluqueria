@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Producto - Zabdiel{% endblock %}
+{% block breadcrumb %}Nuevo Producto{% endblock %}
+
+{% block content %}
+<div class="form-panel-box">
+    <div class="form-panel-header">
+        <div>
+            <h1 class="form-panel-title">Nuevo Producto</h1>
+            <p style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted); margin-top: 0.2rem;">
+                Ingreso de nuevo producto y stock inicial
+            </p>
+        </div>
+        <a href="{% url 'catalogo' %}" class="btn-secondary-action">
+            Volver al Catálogo
+        </a>
+    </div>
+
+    <form method="post" action="{% url 'crear_producto' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label for="{{ form.codigo_barra.id_for_label }}" class="form-label">
+                    {{ form.codigo_barra.label }} <span style="color: var(--stock-quiebre);">*</span>
+                </label>
+                {{ form.codigo_barra }}
+                {% if form.codigo_barra.errors %}
+                <div class="form-error">{{ form.codigo_barra.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.branch_id.id_for_label }}" class="form-label">
+                    {{ form.branch_id.label }}
+                </label>
+                {{ form.branch_id }}
+                <p class="form-help">Identificador de sucursal.</p>
+                {% if form.branch_id.errors %}
+                <div class="form-error">{{ form.branch_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                    {{ form.nombre.label }} <span style="color: var(--stock-quiebre);">*</span>
+                </label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                <div class="form-error">{{ form.nombre.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.marca.id_for_label }}" class="form-label">
+                    {{ form.marca.label }} <span style="color: var(--stock-quiebre);">*</span>
+                </label>
+                {{ form.marca }}
+                {% if form.marca.errors %}
+                <div class="form-error">{{ form.marca.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-subtle); margin: 1.5rem 0 1.25rem;"></div>
+
+        <div class="form-section-title" style="font-size: 0.75rem; font-family: var(--font-mono); font-weight: 700; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+            Stock Inicial y Alertas
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.stock_bodega.id_for_label }}" class="form-label">
+                    {{ form.stock_bodega.label }}
+                </label>
+                {{ form.stock_bodega }}
+                <p class="form-help">{{ form.stock_bodega.help_text }}</p>
+                {% if form.stock_bodega.errors %}
+                <div class="form-error">{{ form.stock_bodega.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.stock_retail.id_for_label }}" class="form-label">
+                    {{ form.stock_retail.label }}
+                </label>
+                {{ form.stock_retail }}
+                <p class="form-help">{{ form.stock_retail.help_text }}</p>
+                {% if form.stock_retail.errors %}
+                <div class="form-error">{{ form.stock_retail.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.umbral_minimo.id_for_label }}" class="form-label">
+                    {{ form.umbral_minimo.label }}
+                </label>
+                {{ form.umbral_minimo }}
+                <p class="form-help">{{ form.umbral_minimo.help_text }}</p>
+                {% if form.umbral_minimo.errors %}
+                <div class="form-error">{{ form.umbral_minimo.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-top: 1.75rem; display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+            <a href="{% url 'catalogo' %}" class="btn-secondary-action">
+                Cancelar
+            </a>
+            <button type="submit" class="btn-primary-action">
+                Guardar Producto
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
